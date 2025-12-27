@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>טרי מהשדה</title>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Heebo',sans-serif;background:#f5f7fa;min-height:100vh}
+        .login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#2d5a27,#4a7c42);padding:20px}
+        .login-container{background:#fff;border-radius:24px;padding:40px;width:100%;max-width:450px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+        .login-logo{text-align:center;margin-bottom:30px}
+        .login-logo i{font-size:4rem;color:#4a7c42}
+        .login-logo h1{font-size:2rem;color:#2d5a27}
+        .login-logo p{color:#888}
+        .login-tabs{display:flex;margin-bottom:30px;background:#f5f5f5;border-radius:12px;padding:5px}
+        .login-tab{flex:1;padding:12px;border:none;background:none;cursor:pointer;font-family:'Heebo',sans-serif;font-size:1rem;border-radius:10px}
+        .login-tab.active{background:#4a7c42;color:#fff}
+        .login-form{display:none}
+        .login-form.active{display:block}
+        .form-group{margin-bottom:20px}
+        .form-group label{display:block;margin-bottom:8px;font-weight:500}
+        .form-group input{width:100%;padding:14px 16px;border:2px solid #e0e0e0;border-radius:12px;font-size:1rem;font-family:'Heebo',sans-serif}
+        .form-group input:focus{outline:none;border-color:#4a7c42}
+        .customer-type-select{display:flex;gap:10px}
+        .type-option{flex:1;padding:15px;border:2px solid #e0e0e0;border-radius:12px;cursor:pointer;text-align:center}
+        .type-option:hover{border-color:#4a7c42}
+        .type-option.selected{border-color:#4a7c42;background:#e8f5e9}
+        .type-option i{font-size:1.5rem;display:block;margin-bottom:8px;color:#4a7c42}
+        .login-btn{width:100%;padding:16px;background:linear-gradient(135deg,#4a7c42,#2d5a27);color:#fff;border:none;border-radius:12px;font-size:1.1rem;font-family:'Heebo',sans-serif;font-weight:600;cursor:pointer}
+        .login-error{background:#ffebee;color:#c62828;padding:12px;border-radius:10px;margin-bottom:20px;display:none}
+        .app-container{display:none}
+        .app-container.active{display:block}
+        header{background:linear-gradient(135deg,#2d5a27,#4a7c42);color:#fff;padding:1rem 2rem;position:sticky;top:0;z-index:1000}
+        .header-content{max-width:1400px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px}
+        .logo{display:flex;align-items:center;gap:12px}
+        .logo i{font-size:2rem;color:#90EE90}
+        .logo h1{font-size:1.5rem}
+        .user-info{display:flex;align-items:center;gap:15px;background:rgba(255,255,255,.1);padding:8px 16px;border-radius:50px}
+        .user-type-badge{background:#ff9800;padding:4px 10px;border-radius:20px;font-size:.8rem}
+        .user-type-badge.wholesale{background:#2196F3}
+        .header-btns{display:flex;gap:10px}
+        .header-btn{background:rgba(255,255,255,.2);border:none;color:#fff;padding:10px 20px;border-radius:50px;cursor:pointer;font-family:'Heebo',sans-serif;display:flex;align-items:center;gap:8px}
+        .cart-count{background:#ff6b6b;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:.8rem}
+        .hero{background:linear-gradient(135deg,#4a7c42,#2d5a27);color:#fff;padding:40px 2rem;text-align:center}
+        .hero h2{font-size:2rem;margin-bottom:10px}
+        main{max-width:1400px;margin:0 auto;padding:30px 20px}
+        .section-title{text-align:center;margin-bottom:30px}
+        .section-title h3{font-size:1.8rem;color:#2d5a27}
+        .categories{display:flex;justify-content:center;gap:10px;margin-bottom:25px;flex-wrap:wrap}
+        .category-btn{padding:10px 20px;border:2px solid #e0e0e0;background:#fff;border-radius:25px;cursor:pointer;font-family:'Heebo',sans-serif}
+        .category-btn.active{background:#4a7c42;color:#fff;border-color:#4a7c42}
+        .products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px}
+        .product-card{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 5px 20px rgba(0,0,0,.1);transition:.3s}
+        .product-card:hover{transform:translateY(-5px)}
+        .product-image{height:180px;background:#f8f8f8;display:flex;align-items:center;justify-content:center;overflow:hidden}
+        .product-image img{width:100%;height:100%;object-fit:cover}
+        .product-info{padding:16px}
+        .product-name{font-size:1.2rem;font-weight:600;margin-bottom:5px}
+        .product-unit{color:#888;font-size:.85rem;margin-bottom:8px}
+        .product-price{font-size:1.4rem;font-weight:700;color:#2d5a27;margin-bottom:12px}
+        .product-price span{font-size:.85rem;font-weight:400;color:#888}
+        .product-controls{display:flex;align-items:center;gap:8px}
+        .qty-controls{display:flex;align-items:center;background:#f5f5f5;border-radius:8px}
+        .qty-btn{background:none;border:none;width:36px;height:36px;font-size:1.1rem;cursor:pointer;color:#2d5a27}
+        .qty-input{width:45px;text-align:center;border:none;background:none;font-size:1rem;font-family:'Heebo',sans-serif}
+        .add-to-cart{flex:1;background:linear-gradient(135deg,#4a7c42,#2d5a27);color:#fff;border:none;padding:10px 16px;border-radius:8px;cursor:pointer;font-family:'Heebo',sans-serif;font-weight:500}
+        .modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:2000}
+        .modal-overlay.active{display:flex;align-items:center;justify-content:center}
+        .modal{background:#fff;border-radius:20px;width:90%;max-width:600px;max-height:85vh;overflow:hidden}
+        .modal-header{background:linear-gradient(135deg,#2d5a27,#4a7c42);color:#fff;padding:16px 20px;display:flex;justify-content:space-between;align-items:center}
+        .close-btn{background:rgba(255,255,255,.2);border:none;color:#fff;width:36px;height:36px;border-radius:50%;cursor:pointer}
+        .modal-body{padding:20px;max-height:400px;overflow-y:auto}
+        .cart-item{display:flex;align-items:center;padding:12px;background:#f9f9f9;border-radius:10px;margin-bottom:10px;gap:12px}
+        .cart-item-image{width:50px;height:50px;border-radius:8px;overflow:hidden}
+        .cart-item-image img{width:100%;height:100%;object-fit:cover}
+        .cart-item-details{flex:1}
+        .cart-item-name{font-weight:600;font-size:.95rem}
+        .cart-item-price{color:#2d5a27;font-size:.9rem}
+        .cart-item-qty{display:flex;align-items:center;gap:6px}
+        .cart-item-qty button{width:28px;height:28px;border:1px solid #ddd;background:#fff;border-radius:6px;cursor:pointer}
+        .remove-item{color:#ff6b6b;background:none;border:none;cursor:pointer}
+        .cart-empty{text-align:center;padding:30px;color:#888}
+        .cart-empty i{font-size:3rem;margin-bottom:10px;display:block;color:#ddd}
+        .modal-footer{padding:16px 20px;border-top:1px solid #eee;background:#fafafa}
+        .cart-total{display:flex;justify-content:space-between;margin-bottom:15px;font-size:1.2rem}
+        .cart-total strong{color:#2d5a27;font-size:1.3rem}
+        .checkout-btn{width:100%;background:linear-gradient(135deg,#4a7c42,#2d5a27);color:#fff;border:none;padding:14px;border-radius:10px;cursor:pointer;font-size:1rem;font-family:'Heebo',sans-serif;font-weight:600}
+        .checkout-btn:disabled{background:#ccc;cursor:not-allowed}
+        .success-message{text-align:center;padding:30px}
+        .success-message i{font-size:4rem;color:#4a7c42;margin-bottom:15px}
+        .success-message h3{color:#2d5a27;margin-bottom:10px}
+        .toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%) translateY(100px);background:#333;color:#fff;padding:12px 24px;border-radius:50px;z-index:3000;opacity:0;transition:.3s}
+        .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+        .toast i{color:#90EE90;margin-left:8px}
+        footer{background:#333;color:#fff;text-align:center;padding:20px;margin-top:40px}
+
+        /* History styles */
+        .history-item{background:#fff;border-radius:12px;padding:15px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+        .history-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+        .history-id{font-weight:600;color:#2d5a27}
+        .history-date{color:#888;font-size:.85rem}
+        .history-status{padding:4px 10px;border-radius:15px;font-size:.8rem}
+        .history-status.COMPLETED{background:#d1fae5;color:#065f46}
+        .history-status.PENDING{background:#fef3c7;color:#92400e}
+        .history-status.DELIVERED{background:#e0e7ff;color:#3730a3}
+        .history-items{font-size:.9rem;color:#555;margin-bottom:8px}
+        .history-total{font-weight:600;color:#2d5a27}
+
+        @media(max-width:768px){.header-content{flex-direction:column}.user-info{width:100%;justify-content:center}}
+    </style>
+</head>
+<body>
+<div class="login-screen" id="loginScreen">
+    <div class="login-container">
+        <div class="login-logo">
+            <i class="fas fa-leaf"></i>
+            <h1>טרי מהשדה</h1>
+            <p>ירקות טריים עד הבית</p>
+        </div>
+        <div class="login-tabs">
+            <button class="login-tab active" onclick="switchTab('login')">התחברות</button>
+            <button class="login-tab" onclick="switchTab('register')">הרשמה</button>
+        </div>
+        <div class="login-error" id="loginError"></div>
+        <form class="login-form active" id="loginForm" onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <label>שם מלא</label>
+                <input type="text" id="loginName" placeholder="הכנס את שמך" required>
+            </div>
+            <button type="submit" class="login-btn"><i class="fas fa-sign-in-alt"></i> התחבר</button>
+        </form>
+        <form class="login-form" id="registerForm" onsubmit="handleRegister(event)">
+            <div class="form-group">
+                <label>תעודת זהות *</label>
+                <input type="text" id="regId" placeholder="הכנס תעודת זהות" required>
+            </div>
+            <div class="form-group">
+                <label>שם מלא *</label>
+                <input type="text" id="regName" placeholder="הכנס שם מלא" required>
+            </div>
+            <div class="form-group">
+                <label>מספר טלפון *</label>
+                <input type="tel" id="regPhone" placeholder="050-0000000" required>
+            </div>
+            <div class="form-group">
+                <label>כתובת</label>
+                <input type="text" id="regAddress" placeholder="רחוב, עיר">
+            </div>
+            <div class="form-group">
+                <label>סוג לקוח *</label>
+                <div class="customer-type-select">
+                    <div class="type-option selected" onclick="selectType('retail',this)">
+                        <i class="fas fa-user"></i>
+                        <span>לקוח פרטי</span>
+                    </div>
+                    <div class="type-option" onclick="selectType('wholesale',this)">
+                        <i class="fas fa-store"></i>
+                        <span>עסק / סיטונאי</span>
+                    </div>
+                </div>
+                <input type="hidden" id="regType" value="retail">
+            </div>
+            <button type="submit" class="login-btn"><i class="fas fa-user-plus"></i> הרשמה</button>
+        </form>
+    </div>
+</div>
+
+<div class="app-container" id="appContainer">
+    <header>
+        <div class="header-content">
+            <div class="logo"><i class="fas fa-leaf"></i><h1>טרי מהשדה</h1></div>
+            <div class="user-info">
+                <span>שלום, <strong id="userName"></strong></span>
+                <span class="user-type-badge" id="userTypeBadge">פרטי</span>
+            </div>
+            <div class="header-btns">
+                <button class="header-btn" onclick="openHistory()">
+                    <i class="fas fa-history"></i><span>הזמנות</span>
+                </button>
+                <button class="header-btn" onclick="openCart()">
+                    <i class="fas fa-shopping-cart"></i><span>עגלה</span>
+                    <span class="cart-count" id="cartCount">0</span>
+                </button>
+                <button class="header-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+    <section class="hero">
+        <h2>🥕 ירקות טריים ישר מהחקלאי 🥔</h2>
+        <p id="heroText">משלוחים יומיים לבית ולעסק</p>
+    </section>
+    <main>
+        <div class="section-title"><h3>המוצרים שלנו</h3></div>
+        <div class="categories">
+            <button class="category-btn active" onclick="filterCategory('all')">הכל</button>
+            <button class="category-btn" onclick="filterCategory('potato')">תפוח אדמה</button>
+            <button class="category-btn" onclick="filterCategory('sweet-potato')">בטטה</button>
+            <button class="category-btn" onclick="filterCategory('carrot')">גזר</button>
+        </div>
+        <div class="products-grid" id="productsGrid"></div>
+    </main>
+    <footer><p>© 2024 טרי מהשדה</p></footer>
+</div>
+
+<!-- Cart Modal -->
+<div class="modal-overlay" id="cartModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3><i class="fas fa-shopping-cart"></i> עגלה</h3>
+            <button class="close-btn" onclick="closeCart()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body" id="cartItems"></div>
+        <div class="modal-footer">
+            <div class="cart-total"><span>סה"כ:</span><strong id="cartTotal">₪0</strong></div>
+            <button class="checkout-btn" id="checkoutBtn" onclick="submitOrder()"><i class="fas fa-check"></i> שלח הזמנה</button>
+        </div>
+    </div>
+</div>
+
+<!-- Success Modal -->
+<div class="modal-overlay" id="successModal">
+    <div class="modal">
+        <div class="success-message">
+            <i class="fas fa-check-circle"></i>
+            <h3>ההזמנה התקבלה!</h3>
+            <p>מספר הזמנה: <strong id="orderId"></strong></p>
+            <button class="checkout-btn" onclick="closeSuccess()" style="margin-top:20px">חזרה לחנות</button>
+        </div>
+    </div>
+</div>
+
+<!-- History Modal -->
+<div class="modal-overlay" id="historyModal">
+    <div class="modal">
+        <div class="modal-header">
+            <h3><i class="fas fa-history"></i> ההזמנות שלי</h3>
+            <button class="close-btn" onclick="closeHistory()"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="modal-body" id="historyItems"></div>
+    </div>
+</div>
+
+<div class="toast" id="toast"><span id="toastMessage"></span><i class="fas fa-check-circle"></i></div>
+
+<script>
+let currentUser=null,products=[],cart=[],currentCategory='all';
+const API_URL='/api';
+const productImages={'תפוח אדמה לבן':'images/potato-white.jpg','תפוח אדמה אדום':'images/potato-red.jpg','גזר':'images/carrot.jpg','בטטה':'images/sweet-potato.jpg'};
+const productCategories={'תפוח אדמה לבן':'potato','תפוח אדמה אדום':'potato','גזר':'carrot','בטטה':'sweet-potato'};
+
+function checkSession(){const s=localStorage.getItem('currentUser');if(s){currentUser=JSON.parse(s);showApp();}}
+
+function switchTab(t){
+    document.querySelectorAll('.login-tab').forEach(e=>e.classList.remove('active'));
+    document.querySelectorAll('.login-form').forEach(e=>e.classList.remove('active'));
+    if(t==='login'){
+        document.querySelectorAll('.login-tab')[0].classList.add('active');
+        document.getElementById('loginForm').classList.add('active');
+    }else{
+        document.querySelectorAll('.login-tab')[1].classList.add('active');
+        document.getElementById('registerForm').classList.add('active');
+    }
+    hideError();
+}
+
+function selectType(t,el){
+    document.querySelectorAll('.type-option').forEach(e=>e.classList.remove('selected'));
+    el.classList.add('selected');
+    document.getElementById('regType').value=t;
+}
+
+function showError(m){const e=document.getElementById('loginError');e.textContent=m;e.style.display='block';}
+function hideError(){document.getElementById('loginError').style.display='none';}
+
+async function handleLogin(e){
+    e.preventDefault();
+    hideError();
+    const name=document.getElementById('loginName').value.trim();
+    try{
+        const r=await fetch(`${API_URL}/auth/login`,{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({name})
+        });
+        const d=await r.json();
+        if(r.ok){
+            currentUser=d;
+            localStorage.setItem('currentUser',JSON.stringify(currentUser));
+            showApp();
+        }else{
+            showError(d.error||'שגיאה');
+        }
+    }catch(err){showError('שגיאת תקשורת');}
+}
+
+async function handleRegister(e){
+    e.preventDefault();
+    hideError();
+    const data={
+        id_number:document.getElementById('regId').value.trim(),
+        name:document.getElementById('regName').value.trim(),
+        phone:document.getElementById('regPhone').value.trim(),
+        address:document.getElementById('regAddress').value.trim(),
+        customer_type:document.getElementById('regType').value
+    };
+    try{
+        const r=await fetch(`${API_URL}/auth/register`,{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify(data)
+        });
+        const d=await r.json();
+        if(r.ok){
+            currentUser=d;
+            localStorage.setItem('currentUser',JSON.stringify(currentUser));
+            showApp();
+        }else{
+            showError(d.error||'שגיאה');
+        }
+    }catch(err){showError('שגיאת תקשורת');}
+}
+
+function logout(){
+    currentUser=null;
+    cart=[];
+    localStorage.removeItem('currentUser');
+    document.getElementById('loginScreen').style.display='flex';
+    document.getElementById('appContainer').classList.remove('active');
+}
+
+function showApp(){
+    document.getElementById('loginScreen').style.display='none';
+    document.getElementById('appContainer').classList.add('active');
+    document.getElementById('userName').textContent=currentUser.name;
+    const b=document.getElementById('userTypeBadge');
+    if(currentUser.customer_type==='wholesale'){
+        b.textContent='סיטונאי';
+        b.classList.add('wholesale');
+        document.getElementById('heroText').textContent='מחירי סיטונאות!';
+    }else{
+        b.textContent='פרטי';
+        b.classList.remove('wholesale');
+    }
+    loadProducts();
+}
+
+async function loadProducts(){
+    try{
+        const r=await fetch(`${API_URL}/products`);
+        products=await r.json();
+        renderProducts();
+    }catch(e){
+        document.getElementById('productsGrid').innerHTML='<p>שגיאה</p>';
+    }
+}
+
+function renderProducts(){
+    const g=document.getElementById('productsGrid');
+    let f=products;
+    if(currentCategory!=='all')f=products.filter(p=>(productCategories[p.name]||'other')===currentCategory);
+    if(!f.length){g.innerHTML='<p style="grid-column:1/-1;text-align:center">אין מוצרים</p>';return;}
+    const disc=currentUser?.customer_type==='wholesale'?0.8:1;
+    g.innerHTML=f.map(p=>{
+        const img=productImages[p.name]||'images/potato-white.jpg';
+        const name=p.size?`${p.name} (${p.size})`:p.name;
+        const price=p.price*disc;
+        return`<div class="product-card"><div class="product-image"><img src="${img}" onerror="this.src='images/potato-white.jpg'"></div><div class="product-info"><div class="product-name">${name}</div><div class="product-unit">${p.unit||'ק"ג'}</div><div class="product-price">₪${price.toFixed(2)} <span>ל${p.unit||'ק"ג'}</span></div><div class="product-controls"><div class="qty-controls"><button class="qty-btn" onclick="changeQty('${p.id}',-0.5)">-</button><input type="number" class="qty-input" id="qty-${p.id}" value="1" min="0.5" step="0.5"><button class="qty-btn" onclick="changeQty('${p.id}',0.5)">+</button></div><button class="add-to-cart" onclick="addToCart('${p.id}')"><i class="fas fa-plus"></i> הוסף</button></div></div></div>`;
+    }).join('');
+}
+
+function filterCategory(c){
+    currentCategory=c;
+    document.querySelectorAll('.category-btn').forEach(b=>b.classList.remove('active'));
+    event.target.classList.add('active');
+    renderProducts();
+}
+
+function changeQty(id,d){const i=document.getElementById(`qty-${id}`);const v=parseFloat(i.value)+d;if(v>=0.5)i.value=v;}
+
+function addToCart(id){
+    const p=products.find(x=>x.id===id);
+    if(!p)return;
+    const q=parseFloat(document.getElementById(`qty-${id}`).value)||1;
+    const disc=currentUser?.customer_type==='wholesale'?0.8:1;
+    const price=p.price*disc;
+    const idx=cart.findIndex(i=>i.product.id===id);
+    if(idx>=0){cart[idx].qty+=q;cart[idx].lineTotal=cart[idx].qty*price;}
+    else{cart.push({product:p,qty:q,unitPrice:price,lineTotal:q*price});}
+    updateCartUI();
+    showToast(`${p.name} נוסף`);
+    document.getElementById(`qty-${id}`).value=1;
+}
+
+function updateCartQty(i,d){cart[i].qty+=d;if(cart[i].qty<=0)cart.splice(i,1);else cart[i].lineTotal=cart[i].qty*cart[i].unitPrice;updateCartUI();}
+function removeFromCart(i){cart.splice(i,1);updateCartUI();}
+
+function updateCartUI(){
+    const t=cart.reduce((s,i)=>s+i.lineTotal,0);
+    const c=cart.reduce((s,i)=>s+i.qty,0);
+    document.getElementById('cartCount').textContent=c.toFixed(1);
+    document.getElementById('cartTotal').textContent=`₪${t.toFixed(2)}`;
+    const el=document.getElementById('cartItems');
+    if(!cart.length){
+        el.innerHTML='<div class="cart-empty"><i class="fas fa-shopping-basket"></i><p>העגלה ריקה</p></div>';
+        document.getElementById('checkoutBtn').disabled=true;
+    }else{
+        document.getElementById('checkoutBtn').disabled=false;
+        el.innerHTML=cart.map((x,i)=>`<div class="cart-item"><div class="cart-item-image"><img src="${productImages[x.product.name]||'images/potato-white.jpg'}"></div><div class="cart-item-details"><div class="cart-item-name">${x.product.size?`${x.product.name} (${x.product.size})`:x.product.name}</div><div class="cart-item-price">₪${x.lineTotal.toFixed(2)}</div></div><div class="cart-item-qty"><button onclick="updateCartQty(${i},-0.5)">-</button><span>${x.qty}</span><button onclick="updateCartQty(${i},0.5)">+</button></div><button class="remove-item" onclick="removeFromCart(${i})"><i class="fas fa-trash"></i></button></div>`).join('');
+    }
+}
+
+function openCart(){document.getElementById('cartModal').classList.add('active');}
+function closeCart(){document.getElementById('cartModal').classList.remove('active');}
+
+async function submitOrder(){
+    if(!cart.length)return;
+    try{
+        const r=await fetch(`${API_URL}/orders`,{
+            method:'POST',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({customer_id:currentUser.customer_id,items:cart.map(i=>({product_id:i.product.id,qty:i.qty}))})
+        });
+        const d=await r.json();
+        if(r.ok){
+            document.getElementById('orderId').textContent=d.order_id;
+            closeCart();
+            document.getElementById('successModal').classList.add('active');
+            cart=[];
+            updateCartUI();
+        }else{showToast(d.error||'שגיאה');}
+    }catch(e){showToast('שגיאה');}
+}
+
+function closeSuccess(){document.getElementById('successModal').classList.remove('active');}
+
+// History
+async function openHistory(){
+    document.getElementById('historyModal').classList.add('active');
+    document.getElementById('historyItems').innerHTML='<div class="cart-empty"><i class="fas fa-spinner fa-spin"></i><p>טוען...</p></div>';
+
+    try{
+        const r=await fetch(`${API_URL}/customers/${currentUser.customer_id}/orders`);
+        const orders=await r.json();
+
+        if(!orders.length){
+            document.getElementById('historyItems').innerHTML='<div class="cart-empty"><i class="fas fa-inbox"></i><p>אין הזמנות קודמות</p></div>';
+            return;
+        }
+
+        document.getElementById('historyItems').innerHTML=orders.map(o=>`
+            <div class="history-item">
+                <div class="history-header">
+                    <span class="history-id">#${o.order_id.slice(-8)}</span>
+                    <span class="history-status ${o.status}">${getStatusText(o.status)}</span>
+                </div>
+                <div class="history-date">${o.created_at?new Date(o.created_at).toLocaleDateString('he-IL'):'-'}</div>
+                <div class="history-items">${o.items.map(i=>`${i.name} x${i.qty}`).join(', ')}</div>
+                <div class="history-total">סה"כ: ₪${o.total.toFixed(2)}</div>
+            </div>
+        `).join('');
+    }catch(e){
+        document.getElementById('historyItems').innerHTML='<div class="cart-empty"><i class="fas fa-exclamation-circle"></i><p>שגיאה בטעינה</p></div>';
+    }
+}
+
+function getStatusText(s){
+    const t={'PENDING':'ממתין','PROCESSING':'בטיפול','COMPLETED':'הושלם','DELIVERED':'נמסר','CANCELLED':'בוטל'};
+    return t[s]||s;
+}
+
+function closeHistory(){document.getElementById('historyModal').classList.remove('active');}
+
+function showToast(m){const t=document.getElementById('toast');document.getElementById('toastMessage').textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+
+document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('active');}));
+
+//checkSession();
+</script>
+</body>
+</html>

@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ניהול הזמנות - טרי מהשדה</title>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Heebo', sans-serif; background: #f0f2f5; min-height: 100vh; }
+
+        header {
+            background: linear-gradient(135deg, #1a365d 0%, #2d5a27 100%);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo { display: flex; align-items: center; gap: 12px; }
+        .logo i { font-size: 2rem; }
+        .logo h1 { font-size: 1.5rem; }
+
+        .back-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Heebo', sans-serif;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        main { max-width: 1400px; margin: 0 auto; padding: 30px 20px; }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        .stat-card i { font-size: 2rem; margin-bottom: 10px; }
+        .stat-card.orders i { color: #3b82f6; }
+        .stat-card.revenue i { color: #10b981; }
+        .stat-card.pending i { color: #f59e0b; }
+        .stat-card.customers i { color: #8b5cf6; }
+
+        .stat-value { font-size: 2rem; font-weight: 700; color: #1a365d; }
+        .stat-label { color: #666; font-size: 0.9rem; }
+
+        .filters {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-group { display: flex; align-items: center; gap: 8px; }
+        .filter-group label { font-weight: 500; color: #555; }
+        .filter-group select, .filter-group input {
+            padding: 10px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: 'Heebo', sans-serif;
+        }
+
+        .refresh-btn {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Heebo', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-right: auto;
+        }
+
+        .orders-list { display: flex; flex-direction: column; gap: 15px; }
+
+        .order-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        .order-header {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+        }
+
+        .order-header:hover { background: #f9f9f9; }
+
+        .order-info h3 { font-size: 1.1rem; color: #1a365d; margin-bottom: 5px; }
+        .order-info p { color: #666; font-size: 0.9rem; margin: 3px 0; }
+
+        .order-meta { text-align: left; }
+        .order-total { font-size: 1.3rem; font-weight: 700; color: #2d5a27; }
+        .order-date { color: #888; font-size: 0.85rem; }
+
+        .order-status {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-top: 8px;
+        }
+
+        .status-COMPLETED { background: #d1fae5; color: #065f46; }
+        .status-PENDING { background: #fef3c7; color: #92400e; }
+        .status-CANCELLED { background: #fee2e2; color: #991b1b; }
+        .status-PROCESSING { background: #dbeafe; color: #1e40af; }
+        .status-DELIVERED { background: #e0e7ff; color: #3730a3; }
+
+        .order-details {
+            display: none;
+            padding: 20px;
+            background: #f9fafb;
+            border-top: 1px solid #eee;
+        }
+
+        .order-details.active { display: block; }
+
+        .customer-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+        }
+
+        .customer-info div { }
+        .customer-info label { font-size: 0.8rem; color: #888; display: block; }
+        .customer-info span { font-weight: 500; }
+
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .items-table th, .items-table td {
+            padding: 12px 15px;
+            text-align: right;
+            border-bottom: 1px solid #eee;
+        }
+
+        .items-table th { background: #f3f4f6; font-weight: 600; color: #555; }
+        .items-table tr:last-child td { border-bottom: none; }
+
+        .status-actions {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .status-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Heebo', sans-serif;
+            font-size: 0.9rem;
+        }
+
+        .status-btn.pending { background: #fef3c7; color: #92400e; }
+        .status-btn.processing { background: #dbeafe; color: #1e40af; }
+        .status-btn.completed { background: #d1fae5; color: #065f46; }
+        .status-btn.delivered { background: #e0e7ff; color: #3730a3; }
+        .status-btn.cancelled { background: #fee2e2; color: #991b1b; }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px;
+            color: #888;
+        }
+
+        .empty-state i { font-size: 4rem; margin-bottom: 15px; color: #ddd; }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            margin-right: 5px;
+        }
+
+        .badge.wholesale { background: #dbeafe; color: #1e40af; }
+        .badge.retail { background: #fef3c7; color: #92400e; }
+
+        @media (max-width: 768px) {
+            .order-header { flex-direction: column; gap: 15px; }
+            .order-meta { text-align: right; }
+            .filters { flex-direction: column; align-items: stretch; }
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            border: none;
+            background: #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            font-family: 'Heebo', sans-serif;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #1a365d 0%, #2d5a27 100%);
+            color: white;
+        }
+
+        .customers-table-container {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        .customers-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .customers-table th, .customers-table td {
+            padding: 15px;
+            text-align: right;
+            border-bottom: 1px solid #eee;
+        }
+
+        .customers-table th {
+            background: #f3f4f6;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .customers-table tr:hover {
+            background: #f9fafb;
+        }
+
+        .customer-badge {
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+        }
+
+        .customer-badge.retail { background: #fef3c7; color: #92400e; }
+        .customer-badge.wholesale { background: #dbeafe; color: #1e40af; }
+
+        .balance-positive { color: #dc2626; }
+        .balance-zero { color: #16a34a; }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'Heebo', sans-serif;
+            font-size: 0.85rem;
+            margin-left: 5px;
+        }
+
+        .action-btn.view { background: #dbeafe; color: #1e40af; }
+        .action-btn.edit { background: #fef3c7; color: #92400e; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">
+                <i class="fas fa-cog"></i>
+                <h1>ניהול הזמנות</h1>
+            </div>
+            <a href="/" class="back-btn">
+                <i class="fas fa-arrow-right"></i>
+                חזרה לחנות
+            </a>
+        </div>
+    </header>
+
+    <main>
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchAdminTab('orders')">
+                <i class="fas fa-shopping-bag"></i> הזמנות
+            </button>
+            <button class="tab-btn" onclick="switchAdminTab('customers')">
+                <i class="fas fa-users"></i> לקוחות
+            </button>
+        </div>
+
+        <div class="tab-content" id="ordersTab">
+        <div class="stats">
+            <div class="stat-card orders">
+                <i class="fas fa-shopping-bag"></i>
+                <div class="stat-value" id="totalOrders">0</div>
+                <div class="stat-label">סה"כ הזמנות</div>
+            </div>
+            <div class="stat-card revenue">
+                <i class="fas fa-shekel-sign"></i>
+                <div class="stat-value" id="totalRevenue">₪0</div>
+                <div class="stat-label">סה"כ הכנסות</div>
+            </div>
+            <div class="stat-card pending">
+                <i class="fas fa-clock"></i>
+                <div class="stat-value" id="pendingOrders">0</div>
+                <div class="stat-label">ממתינות לטיפול</div>
+            </div>
+            <div class="stat-card customers">
+                <i class="fas fa-users"></i>
+                <div class="stat-value" id="totalCustomers">0</div>
+                <div class="stat-label">לקוחות</div>
+            </div>
+        </div>
+
+        <div class="filters">
+            <div class="filter-group">
+                <label>סטטוס:</label>
+                <select id="filterStatus" onchange="filterOrders()">
+                    <option value="">הכל</option>
+                    <option value="PENDING">ממתין</option>
+                    <option value="PROCESSING">בטיפול</option>
+                    <option value="COMPLETED">הושלם</option>
+                    <option value="DELIVERED">נמסר</option>
+                    <option value="CANCELLED">בוטל</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>סוג לקוח:</label>
+                <select id="filterType" onchange="filterOrders()">
+                    <option value="">הכל</option>
+                    <option value="retail">פרטי</option>
+                    <option value="wholesale">סיטונאי</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>חיפוש:</label>
+                <input type="text" id="searchInput" placeholder="שם לקוח או מספר הזמנה" oninput="filterOrders()">
+            </div>
+            <button class="refresh-btn" onclick="loadOrders()">
+                <i class="fas fa-sync-alt"></i>
+                רענן
+            </button>
+        </div>
+
+        <div class="orders-list" id="ordersList">
+            <div class="empty-state">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>טוען הזמנות...</p>
+            </div>
+        </div>
+        </div>
+
+        <div class="tab-content" id="customersTab" style="display:none;">
+            <div class="customers-table-container">
+                <table class="customers-table" id="customersTable">
+                    <thead>
+                        <tr>
+                            <th>שם</th>
+                            <th>טלפון</th>
+                            <th>כתובת</th>
+                            <th>סוג</th>
+                            <th>יתרה</th>
+                            <th>פעולות</th>
+                        </tr>
+                    </thead>
+                    <tbody id="customersBody">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let allOrders = [];
+
+        async function loadOrders() {
+            try {
+                const res = await fetch('/api/admin/orders');
+                allOrders = await res.json();
+                updateStats();
+                filterOrders();
+            } catch (err) {
+                document.getElementById('ordersList').innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <p>שגיאה בטעינת הזמנות</p>
+                    </div>
+                `;
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('totalOrders').textContent = allOrders.length;
+
+            const revenue = allOrders.reduce((sum, o) => sum + o.total, 0);
+            document.getElementById('totalRevenue').textContent = `₪${revenue.toFixed(0)}`;
+
+            const pending = allOrders.filter(o => o.status === 'PENDING' || o.status === 'PROCESSING').length;
+            document.getElementById('pendingOrders').textContent = pending;
+
+            const customers = new Set(allOrders.map(o => o.customer_id)).size;
+            document.getElementById('totalCustomers').textContent = customers;
+        }
+
+        function filterOrders() {
+            const status = document.getElementById('filterStatus').value;
+            const type = document.getElementById('filterType').value;
+            const search = document.getElementById('searchInput').value.toLowerCase();
+
+            let filtered = allOrders;
+
+            if (status) {
+                filtered = filtered.filter(o => o.status === status);
+            }
+
+            if (type) {
+                filtered = filtered.filter(o => o.customer_type === type);
+            }
+
+            if (search) {
+                filtered = filtered.filter(o =>
+                    o.customer_name?.toLowerCase().includes(search) ||
+                    o.order_id.toLowerCase().includes(search)
+                );
+            }
+
+            renderOrders(filtered);
+        }
+
+        function renderOrders(orders) {
+            const container = document.getElementById('ordersList');
+
+            if (orders.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <p>אין הזמנות להצגה</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = orders.map(order => `
+                <div class="order-card">
+                    <div class="order-header" onclick="toggleOrder('${order.order_id}')">
+                        <div class="order-info">
+                            <h3>
+                                <span class="badge ${order.customer_type}">${order.customer_type === 'wholesale' ? 'סיטונאי' : 'פרטי'}</span>
+                                ${order.customer_name || 'לקוח לא ידוע'}
+                            </h3>
+                            <p><i class="fas fa-hashtag"></i> ${order.order_id}</p>
+                            <p><i class="fas fa-phone"></i> ${order.phone || '-'}</p>
+                            <span class="order-status status-${order.status}">${getStatusText(order.status)}</span>
+                        </div>
+                        <div class="order-meta">
+                            <div class="order-total">₪${order.total.toFixed(2)}</div>
+                            <div class="order-date">${order.created_at || '-'}</div>
+                            <i class="fas fa-chevron-down" style="margin-top: 10px; color: #888;"></i>
+                        </div>
+                    </div>
+                    <div class="order-details" id="details-${order.order_id}">
+                        <div class="customer-info">
+                            <div>
+                                <label>שם</label>
+                                <span>${order.customer_name || '-'}</span>
+                            </div>
+                            <div>
+                                <label>טלפון</label>
+                                <span>${order.phone || '-'}</span>
+                            </div>
+                            <div>
+                                <label>כתובת</label>
+                                <span>${order.address || '-'}</span>
+                            </div>
+                            <div>
+                                <label>סוג לקוח</label>
+                                <span>${order.customer_type === 'wholesale' ? 'סיטונאי' : 'פרטי'}</span>
+                            </div>
+                        </div>
+
+                        <table class="items-table">
+                            <thead>
+                                <tr>
+                                    <th>מוצר</th>
+                                    <th>כמות</th>
+                                    <th>מחיר יחידה</th>
+                                    <th>סה"כ</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${order.items.map(item => `
+                                    <tr>
+                                        <td>${item.name}</td>
+                                        <td>${item.qty}</td>
+                                        <td>₪${item.unit_price.toFixed(2)}</td>
+                                        <td>₪${item.line_total.toFixed(2)}</td>
+                                    </tr>
+                                `).join('')}
+                                <tr style="background: #f9f9f9; font-weight: 600;">
+                                    <td colspan="3">סה"כ</td>
+                                    <td>₪${order.total.toFixed(2)}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <div class="status-actions">
+                            <span style="line-height: 36px; margin-left: 10px;">שנה סטטוס:</span>
+                            <button class="status-btn pending" onclick="updateStatus('${order.order_id}', 'PENDING')">ממתין</button>
+                            <button class="status-btn processing" onclick="updateStatus('${order.order_id}', 'PROCESSING')">בטיפול</button>
+                            <button class="status-btn completed" onclick="updateStatus('${order.order_id}', 'COMPLETED')">הושלם</button>
+                            <button class="status-btn delivered" onclick="updateStatus('${order.order_id}', 'DELIVERED')">נמסר</button>
+                            <button class="status-btn cancelled" onclick="updateStatus('${order.order_id}', 'CANCELLED')">בוטל</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getStatusText(status) {
+            const texts = {
+                'PENDING': 'ממתין',
+                'PROCESSING': 'בטיפול',
+                'COMPLETED': 'הושלם',
+                'DELIVERED': 'נמסר',
+                'CANCELLED': 'בוטל'
+            };
+            return texts[status] || status;
+        }
+
+        function toggleOrder(orderId) {
+            const details = document.getElementById(`details-${orderId}`);
+            details.classList.toggle('active');
+        }
+
+        async function updateStatus(orderId, status) {
+            try {
+                const res = await fetch(`/api/admin/orders/${orderId}/status`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status })
+                });
+
+                if (res.ok) {
+                    loadOrders();
+                }
+            } catch (err) {
+                alert('שגיאה בעדכון סטטוס');
+            }
+        }
+
+        // טעינה ראשונית
+        loadOrders();
+        loadCustomers();
+
+        // רענון אוטומטי כל 30 שניות
+        setInterval(loadOrders, 30000);
+
+        function switchAdminTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+
+            if (tab === 'orders') {
+                document.querySelectorAll('.tab-btn')[0].classList.add('active');
+                document.getElementById('ordersTab').style.display = 'block';
+            } else {
+                document.querySelectorAll('.tab-btn')[1].classList.add('active');
+                document.getElementById('customersTab').style.display = 'block';
+                loadCustomers();
+            }
+        }
+
+        async function loadCustomers() {
+            try {
+                const res = await fetch('/api/customers');
+                const customers = await res.json();
+                renderCustomers(customers);
+            } catch (err) {
+                console.error('Error loading customers:', err);
+            }
+        }
+
+        function renderCustomers(customers) {
+            const tbody = document.getElementById('customersBody');
+
+            if (!customers.length) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:30px;color:#888;">אין לקוחות</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = customers.map(c => `
+                <tr>
+                    <td><strong>${c.name}</strong></td>
+                    <td>${c.phone || '-'}</td>
+                    <td>${c.address || '-'}</td>
+                    <td><span class="customer-badge ${c.customer_type}">${c.customer_type === 'wholesale' ? 'סיטונאי' : 'פרטי'}</span></td>
+                    <td class="${c.balance > 0 ? 'balance-positive' : 'balance-zero'}">₪${c.balance.toFixed(2)}</td>
+                    <td>
+                        <button class="action-btn view" onclick="viewCustomerOrders('${c.id}', '${c.name}')">
+                            <i class="fas fa-eye"></i> הזמנות
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function viewCustomerOrders(customerId, customerName) {
+            // סינון הזמנות לפי לקוח
+            document.getElementById('searchInput').value = customerName;
+            switchAdminTab('orders');
+            filterOrders();
+        }
+    </script>
+</body>
+</html>
