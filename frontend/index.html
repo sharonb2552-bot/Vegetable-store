@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!<!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
     <meta charset="UTF-8">
@@ -42,7 +42,8 @@
         .user-type-badge{background:#ff9800;padding:4px 10px;border-radius:20px;font-size:.8rem}
         .user-type-badge.wholesale{background:#2196F3}
         .header-btns{display:flex;gap:10px}
-        .header-btn{background:rgba(255,255,255,.2);border:none;color:#fff;padding:10px 20px;border-radius:50px;cursor:pointer;font-family:'Heebo',sans-serif;display:flex;align-items:center;gap:8px}
+        .header-btn{background:rgba(255,255,255,.2);border:none;color:#fff;padding:10px 20px;border-radius:50px;cursor:pointer;font-family:'Heebo',sans-serif;display:flex;align-items:center;gap:8px;text-decoration:none}
+        .admin-btn{background:rgba(255,193,7,.3)}
         .cart-count{background:#ff6b6b;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:.8rem}
         .hero{background:linear-gradient(135deg,#4a7c42,#2d5a27);color:#fff;padding:40px 2rem;text-align:center}
         .hero h2{font-size:2rem;margin-bottom:10px}
@@ -177,6 +178,9 @@
                 <span class="user-type-badge" id="userTypeBadge">פרטי</span>
             </div>
             <div class="header-btns">
+                <a class="header-btn admin-btn" href="/admin" id="adminBtn" style="display:none;">
+                    <i class="fas fa-cog"></i><span>ניהול</span>
+                </a>
                 <button class="header-btn" onclick="openHistory()">
                     <i class="fas fa-history"></i><span>הזמנות</span>
                 </button>
@@ -346,6 +350,13 @@ function showApp(){
         b.textContent='פרטי';
         b.classList.remove('wholesale');
     }
+    // הצג כפתור ניהול למנהל בלבד
+    const ADMIN_ID = '207182049';
+    if(currentUser.customer_id === ADMIN_ID){
+        document.getElementById('adminBtn').style.display='flex';
+    }else{
+        document.getElementById('adminBtn').style.display='none';
+    }
     loadProducts();
 }
 
@@ -479,7 +490,7 @@ function showToast(m){const t=document.getElementById('toast');document.getEleme
 
 document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('active');}));
 
-//checkSession();
+checkSession();
 </script>
 </body>
 </html>
