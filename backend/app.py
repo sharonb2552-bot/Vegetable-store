@@ -16,10 +16,11 @@ CORS(app)
 # הגדרות DB
 # ===================
 DB_CONFIG = {
-    'user': 'storedb1',
-    'password': '159753',
-    'host': 'localhost',
-    'database': 'storedb1'
+    'user': 'root',
+    'password': 'TmMGuhdXgQuVvyraaaYkJyRwEKsgOQcO',
+    'host': 'metro.proxy.rlwy.net',
+    'port': 53247,
+    'database': 'railway'
 }
 
 
